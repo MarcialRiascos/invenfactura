@@ -2,80 +2,6 @@ CREATE SCHEMA IF NOT EXISTS `invenfactura` DEFAULT CHARACTER SET utf8 ;
 USE `invenfactura` ;
 
 -- -----------------------------------------------------
--- Table `invenfactura`.`proveedores`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `invenfactura`.`proveedores` ;
-
-CREATE TABLE IF NOT EXISTS `invenfactura`.`proveedores` (
-  `id_proveedor` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nombre_empresa` VARCHAR(45) NULL,
-  `nombre_contacto` VARCHAR(45) NULL,
-  `telefono` VARCHAR(45) NULL,
-  `telefono_dos` VARCHAR(45) NULL,
-  `email` VARCHAR(45) NULL,
-  `direccion` TEXT NULL,
-  PRIMARY KEY (`id_proveedor`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `invenfactura`.`categorias`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `invenfactura`.`categorias` ;
-
-CREATE TABLE IF NOT EXISTS `invenfactura`.`categorias` (
-  `id_categoria` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `categoria` VARCHAR(45) NOT NULL,
-  `descripcion` TEXT NULL,
-  PRIMARY KEY (`id_categoria`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `invenfactura`.`productos`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `invenfactura`.`productos` ;
-
-CREATE TABLE IF NOT EXISTS `invenfactura`.`productos` (
-  `id_producto` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(45) NOT NULL,
-  `categorias_id_categoria` INT UNSIGNED NOT NULL,
-  `codigo` VARCHAR(45) NOT NULL,
-  `descripcion` TEXT NULL,
-  `precio` INT NOT NULL,
-  `cantidad_actual` INT NOT NULL,
-  `cantidad_minima` INT NULL,
-  `ubicacion` VARCHAR(45) NULL,
-  `proveedores_id_proveedor` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`id_producto`),
-  INDEX `fk_productos_proveedores_idx` (`proveedores_id_proveedor` ASC),
-  INDEX `fk_productos_categorias1_idx` (`categorias_id_categoria` ASC),
-  CONSTRAINT `fk_productos_proveedores`
-    FOREIGN KEY (`proveedores_id_proveedor`)
-    REFERENCES `invenfactura`.`proveedores` (`id_proveedor`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_productos_categorias1`
-    FOREIGN KEY (`categorias_id_categoria`)
-    REFERENCES `invenfactura`.`categorias` (`id_categoria`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `invenfactura`.`tipo_movimientos`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `invenfactura`.`tipo_movimientos` ;
-
-CREATE TABLE IF NOT EXISTS `invenfactura`.`tipo_movimientos` (
-  `id_tipo_movimiento` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `tipo_movimiento` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id_tipo_movimiento`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `invenfactura`.`roles`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `invenfactura`.`roles` ;
@@ -125,7 +51,7 @@ CREATE TABLE IF NOT EXISTS `invenfactura`.`usuarios` (
   `tipo_identificacion_id_tipo_identificacion` INT UNSIGNED NOT NULL,
   `numero_identificacion` VARCHAR(45) NOT NULL,
   `email` VARCHAR(45) NOT NULL,
-  `password` VARCHAR(45) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
   `roles_id_rol` INT UNSIGNED NOT NULL,
   `estados_id_estado` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id_usuario`),
@@ -151,6 +77,94 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `invenfactura`.`proveedores`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `invenfactura`.`proveedores` ;
+
+CREATE TABLE IF NOT EXISTS `invenfactura`.`proveedores` (
+  `id_proveedor` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre_empresa` VARCHAR(45) NULL,
+  `nombre_contacto` VARCHAR(45) NULL,
+  `telefono` VARCHAR(45) NULL,
+  `telefono_dos` VARCHAR(45) NULL,
+  `email` VARCHAR(45) NULL,
+  `direccion` TEXT NULL,
+  `usuarios_id_usuario` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id_proveedor`),
+  INDEX `fk_proveedores_usuarios1_idx` (`usuarios_id_usuario` ASC),
+  CONSTRAINT `fk_proveedores_usuarios1`
+    FOREIGN KEY (`usuarios_id_usuario`)
+    REFERENCES `invenfactura`.`usuarios` (`id_usuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `invenfactura`.`categorias`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `invenfactura`.`categorias` ;
+
+CREATE TABLE IF NOT EXISTS `invenfactura`.`categorias` (
+  `id_categoria` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `categoria` VARCHAR(45) NOT NULL,
+  `descripcion` TEXT NULL,
+  PRIMARY KEY (`id_categoria`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `invenfactura`.`productos`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `invenfactura`.`productos` ;
+
+CREATE TABLE IF NOT EXISTS `invenfactura`.`productos` (
+  `id_producto` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(45) NOT NULL,
+  `categorias_id_categoria` INT UNSIGNED NOT NULL,
+  `codigo` VARCHAR(45) NOT NULL,
+  `descripcion` TEXT NULL,
+  `precio` INT NOT NULL,
+  `cantidad_actual` INT NOT NULL,
+  `cantidad_minima` INT NULL,
+  `ubicacion` TEXT NULL,
+  `proveedores_id_proveedor` INT UNSIGNED NOT NULL,
+  `usuarios_id_usuario` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id_producto`),
+  INDEX `fk_productos_proveedores_idx` (`proveedores_id_proveedor` ASC),
+  INDEX `fk_productos_categorias1_idx` (`categorias_id_categoria` ASC),
+  INDEX `fk_productos_usuarios1_idx` (`usuarios_id_usuario` ASC),
+  CONSTRAINT `fk_productos_proveedores`
+    FOREIGN KEY (`proveedores_id_proveedor`)
+    REFERENCES `invenfactura`.`proveedores` (`id_proveedor`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_productos_categorias1`
+    FOREIGN KEY (`categorias_id_categoria`)
+    REFERENCES `invenfactura`.`categorias` (`id_categoria`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_productos_usuarios1`
+    FOREIGN KEY (`usuarios_id_usuario`)
+    REFERENCES `invenfactura`.`usuarios` (`id_usuario`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `invenfactura`.`tipo_movimientos`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `invenfactura`.`tipo_movimientos` ;
+
+CREATE TABLE IF NOT EXISTS `invenfactura`.`tipo_movimientos` (
+  `id_tipo_movimiento` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `tipo_movimiento` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_tipo_movimiento`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `invenfactura`.`movimientos`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `invenfactura`.`movimientos` ;
@@ -159,13 +173,17 @@ CREATE TABLE IF NOT EXISTS `invenfactura`.`movimientos` (
   `id_movimiento` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `tipo_movimientos_id_tipo_movimiento` INT UNSIGNED NOT NULL,
   `productos_id_producto` INT UNSIGNED NOT NULL,
+  `lote` VARCHAR(45) NULL,
   `cantidad_movimiento` INT NOT NULL,
   `motivo_movimiento` TEXT NULL,
   `usuarios_id_usuario` INT UNSIGNED NOT NULL,
+  `fecha_vencimiento` VARCHAR(45) NULL,
+  `usuarios_id_usuario1` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id_movimiento`),
   INDEX `fk_movimientos_productos1_idx` (`productos_id_producto` ASC),
   INDEX `fk_movimientos_tipo_movimientos1_idx` (`tipo_movimientos_id_tipo_movimiento` ASC),
   INDEX `fk_movimientos_usuarios1_idx` (`usuarios_id_usuario` ASC),
+  INDEX `fk_movimientos_usuarios2_idx` (`usuarios_id_usuario1` ASC),
   CONSTRAINT `fk_movimientos_productos1`
     FOREIGN KEY (`productos_id_producto`)
     REFERENCES `invenfactura`.`productos` (`id_producto`)
@@ -180,62 +198,12 @@ CREATE TABLE IF NOT EXISTS `invenfactura`.`movimientos` (
     FOREIGN KEY (`usuarios_id_usuario`)
     REFERENCES `invenfactura`.`usuarios` (`id_usuario`)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_movimientos_usuarios2`
+    FOREIGN KEY (`usuarios_id_usuario1`)
+    REFERENCES `invenfactura`.`usuarios` (`id_usuario`)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `invenfactura`.`clientes`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `invenfactura`.`clientes` ;
-
-CREATE TABLE IF NOT EXISTS `invenfactura`.`clientes` (
-  `id_cliente` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(45) NOT NULL,
-  `apellido` VARCHAR(45) NOT NULL,
-  `telefono` VARCHAR(45) NOT NULL,
-  `telefono_dos` VARCHAR(45) NULL,
-  `numero_identificacion` VARCHAR(45) NULL,
-  `email` VARCHAR(45) NULL,
-  `direccion` VARCHAR(45) NULL,
-  PRIMARY KEY (`id_cliente`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `invenfactura`.`facturas`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `invenfactura`.`facturas` ;
-
-CREATE TABLE IF NOT EXISTS `invenfactura`.`facturas` (
-  `id_factura` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `total_factura` INT NOT NULL,
-  PRIMARY KEY (`id_factura`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `invenfactura`.`detalle_facturas`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `invenfactura`.`detalle_facturas` ;
-
-CREATE TABLE IF NOT EXISTS `invenfactura`.`detalle_facturas` (
-  `id_detalle_factura` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `cantidad` INT NOT NULL,
-  `total_precio` INT NOT NULL,
-  PRIMARY KEY (`id_detalle_factura`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `invenfactura`.`acciones`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `invenfactura`.`acciones` ;
-
-CREATE TABLE IF NOT EXISTS `invenfactura`.`acciones` (
-  `id_accion` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `accion` VARCHAR(45) NOT NULL,
-  PRIMARY KEY (`id_accion`))
 ENGINE = InnoDB;
 
 
@@ -246,20 +214,69 @@ DROP TABLE IF EXISTS `invenfactura`.`historial` ;
 
 CREATE TABLE IF NOT EXISTS `invenfactura`.`historial` (
   `id_historial` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `acciones_id_accion` INT UNSIGNED NOT NULL,
+  `accion` VARCHAR(45) NOT NULL,
   `descripcion` TEXT NULL,
   `usuarios_id_usuario` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id_historial`),
   INDEX `fk_historial_usuarios1_idx` (`usuarios_id_usuario` ASC),
-  INDEX `fk_historial_acciones1_idx` (`acciones_id_accion` ASC),
   CONSTRAINT `fk_historial_usuarios1`
     FOREIGN KEY (`usuarios_id_usuario`)
     REFERENCES `invenfactura`.`usuarios` (`id_usuario`)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `invenfactura`.`modulos`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `invenfactura`.`modulos` ;
+
+CREATE TABLE IF NOT EXISTS `invenfactura`.`modulos` (
+  `id_modulo` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `modulo` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id_modulo`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `invenfactura`.`permisos`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `invenfactura`.`permisos` ;
+
+CREATE TABLE IF NOT EXISTS `invenfactura`.`permisos` (
+  `id_permiso` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `permiso` VARCHAR(45) NOT NULL,
+  `modulos_id_modulo` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`id_permiso`),
+  INDEX `fk_permisos_modulos1_idx` (`modulos_id_modulo` ASC),
+  CONSTRAINT `fk_permisos_modulos1`
+    FOREIGN KEY (`modulos_id_modulo`)
+    REFERENCES `invenfactura`.`modulos` (`id_modulo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `invenfactura`.`roles_has_permisos`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `invenfactura`.`roles_has_permisos` ;
+
+CREATE TABLE IF NOT EXISTS `invenfactura`.`roles_has_permisos` (
+  `roles_id_rol` INT UNSIGNED NOT NULL,
+  `permisos_id_permiso` INT UNSIGNED NOT NULL,
+  PRIMARY KEY (`roles_id_rol`, `permisos_id_permiso`),
+  INDEX `fk_roles_has_permisos_permisos1_idx` (`permisos_id_permiso` ASC),
+  INDEX `fk_roles_has_permisos_roles1_idx` (`roles_id_rol` ASC),
+  CONSTRAINT `fk_roles_has_permisos_roles1`
+    FOREIGN KEY (`roles_id_rol`)
+    REFERENCES `invenfactura`.`roles` (`id_rol`)
+    ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_historial_acciones1`
-    FOREIGN KEY (`acciones_id_accion`)
-    REFERENCES `invenfactura`.`acciones` (`id_accion`)
+  CONSTRAINT `fk_roles_has_permisos_permisos1`
+    FOREIGN KEY (`permisos_id_permiso`)
+    REFERENCES `invenfactura`.`permisos` (`id_permiso`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
